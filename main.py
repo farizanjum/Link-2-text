@@ -22,6 +22,8 @@ def serve(path):
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
+"""
 if __name__ == '__main__':
     # Ensure the app listens on all interfaces (0.0.0.0) for external access
     app.run(host='0.0.0.0', port=5000, debug=True)
+"""
