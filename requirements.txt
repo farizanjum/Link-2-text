@@ -1,4 +1,5 @@
 flask
+vercel-wsgi
 requests
 beautifulsoup4
 newspaper3k
