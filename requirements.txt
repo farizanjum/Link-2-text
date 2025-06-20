@@ -5,3 +5,4 @@ newspaper3k
 nltk
 python-dotenv
 openai
+lxml[html_clean]
