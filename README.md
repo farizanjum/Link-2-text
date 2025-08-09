@@ -1,8 +1,10 @@
 Link2Text – AI Content Generator
 ================================
 
-Turn tech/AI articles into WhatsApp-ready content with proper formatting, minimal emoji use, and relevant cover images. Choose between ChatGPT (premium) and Mistral (free) models. Includes a simple login gate for ChatGPT usage.
+<img width="1243" height="785" alt="{985A0B9E-5F62-49E7-9F1A-2F81AA13C41C}" src="https://github.com/user-attachments/assets/6c14705f-8341-483f-8dcb-1003297ce6be" />
 
+
+Turn tech/AI articles into WhatsApp-ready content with proper formatting, minimal emoji use, and relevant cover images. Choose between ChatGPT (premium) and Mistral (free) models.
 Features
 --------
 - URL processing and direct text input
