@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link2Text - AI Content Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #8a2be2;
+            --secondary-color: #00bfff;
+            --dark-bg: #0d1117;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-color: #e6e6e6;
+            --input-bg: rgba(30, 41, 59, 0.5);
+            --button-gradient: linear-gradient(135deg, #8a2be2, #00bfff);
+            --glass-effect: blur(10px);
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.2) 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(0, 191, 255, 0.2) 0%, transparent 30%);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .glass-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: var(--glass-effect);
+            -webkit-backdrop-filter: var(--glass-effect);
+            border: 1px solid var(--card-border);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .tab-button i {
+            margin-right: 8px;
+        }
+        
+        .tab-button.active {
+            background: var(--button-gradient);
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        .tab-button:hover:not(.active) {
+            background: rgba(50, 61, 79, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+            color: var(--text-color);
+        }
+        
+        .form-control {
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            color: white !important;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            background: rgba(40, 51, 69, 0.5);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(138, 43, 226, 0.25);
+            color: white !important;
+        }
+        
+        .form-control::placeholder {
+            color: rgba(230, 230, 230, 0.5);
+        }
+        
+        .btn-primary {
+            background: var(--button-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-icon {
+            margin-right: 8px;
+        }
+        
+        .model-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .model-card.active {
+            background: rgba(50, 61, 79, 0.7);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        .model-card:hover:not(.active) {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .model-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .model-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .model-description {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .example-link {
+            display: inline-block;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 50px;
+            padding: 10px 20px;
+            margin: 5px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .example-link:hover {
+            background: rgba(50, 61, 79, 0.7);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .example-link i {
+            margin-right: 8px;
+        }
+        
+        .content-preview {
+            white-space: pre-wrap;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background: rgba(20, 31, 49, 0.5);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .whatsapp-preview {
+            background: #075E54;
+            border-radius: 8px;
+            padding: 20px;
+            color: white;
+            white-space: pre-wrap;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+        
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 12px 20px;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            text-decoration: none;
+        }
+        
+        .action-button i {
+            margin-right: 8px;
+        }
+        
+        .action-button.copy {
+            background: rgba(50, 61, 79, 0.7);
+        }
+        
+        .action-button.whatsapp {
+            background: #25D366;
+            color: white;
+            border-color: #25D366;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        
+        .cover-image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .cover-image-option {
+            width: 150px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .cover-image-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .cover-image-option.selected {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .cover-image-option:hover:not(.selected) {
+            transform: scale(1.03);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .selected-cover-image {
+            width: 100%;
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .selected-cover-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 0;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary-color);
+            border-right: 4px solid var(--secondary-color);
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        .loading-text {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .examples-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .examples-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .glass-card {
+                padding: 20px;
+            }
+            
+            .cover-image-option {
+                width: calc(50% - 5px);
+            }
+            
+            .selected-cover-image {
+                height: 200px;
+            }
+            
+            .tab-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .tab-button {
+                flex: 1 0 auto;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header glass-card">
+            <h1>Link2Text</h1>
+            <p>Transform tech articles into WhatsApp-friendly content with AI</p>
+        </div>
+        
+        <div class="glass-card">
+            <div class="tab-buttons">
+                <button class="tab-button active" id="url-tab">
+                    <i class="fas fa-link"></i> URL
+                </button>
+                <button class="tab-button" id="text-tab">
+                    <i class="fas fa-font"></i> Text
+                </button>
+                <button class="tab-button" id="format-tab">
+                    <i class="fas fa-paragraph"></i> Format Only
+                </button>
+            </div>
+            
+            <div id="url-content">
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <div class="model-card active" id="chatgpt-model">
+                            <div class="model-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="model-title">ChatGPT</div>
+                            <div class="model-description">Premium quality (Paid)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="model-card" id="mistral-model">
+                            <div class="model-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="model-title">Mistral</div>
+                            <div class="model-description">Great quality (Free)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="web-search-options">
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="web-search-checkbox">
+                        <label class="form-check-label" for="web-search-checkbox">
+                            Enable web search for enhanced content with references
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="url-input" class="form-label">Paste Tech/AI Article URL:</label>
+                    <input type="text" class="form-control" id="url-input" placeholder="https://techcrunch.com/...">
+                </div>
+                
+                <button class="btn btn-primary w-100" id="generate-btn">
+                    <i class="fas fa-wand-magic-sparkles btn-icon"></i> Generate Content
+                </button>
+            </div>
+            
+            <div id="text-content" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <div class="model-card active" id="chatgpt-model-text">
+                            <div class="model-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="model-title">ChatGPT</div>
+                            <div class="model-description">Premium quality (Paid)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="model-card" id="mistral-model-text">
+                            <div class="model-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="model-title">Mistral</div>
+                            <div class="model-description">Great quality (Free)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="web-search-options-text">
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="web-search-checkbox-text">
+                        <label class="form-check-label" for="web-search-checkbox-text">
+                            Enable web search for enhanced content with references
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="title-input" class="form-label">Title (Optional):</label>
+                    <input type="text" class="form-control" id="title-input" placeholder="Enter a title for your content">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="text-input" class="form-label">Paste Your Text:</label>
+                    <textarea class="form-control" id="text-input" rows="6" placeholder="Paste your text content here..."></textarea>
+                </div>
+                
+                <button class="btn btn-primary w-100" id="generate-text-btn">
+                    <i class="fas fa-wand-magic-sparkles btn-icon"></i> Generate Content
+                </button>
+            </div>
+            
+            <div id="format-content" style="display: none;">
+                <div class="mb-4">
+                    <label for="format-title-input" class="form-label">Title (Optional):</label>
+                    <input type="text" class="form-control" id="format-title-input" placeholder="Enter a title for your content">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="format-text-input" class="form-label">Paste Your Text:</label>
+                    <textarea class="form-control" id="format-text-input" rows="6" placeholder="Paste your text content here..."></textarea>
+                </div>
+                
+                <button class="btn btn-primary w-100" id="format-text-btn">
+                    <i class="fas fa-paragraph btn-icon"></i> Format Text Only
+                </button>
+            </div>
+        </div>
+        
+        <div id="result-container" style="display: none;">
+            <div class="glass-card">
+                <div class="section-title">
+                    <i class="fas fa-image"></i> Select a Cover Image
+                </div>
+                
+                <div class="cover-image-container" id="cover-image-options">
+                    <!-- Cover image options will be dynamically added here -->
+                </div>
+                
+                <div class="selected-cover-image" id="selected-cover-image">
+                    <!-- Selected cover image will be displayed here -->
+                </div>
+                
+                <div class="d-flex justify-content-end mb-4">
+                    <button class="action-button copy" id="copy-btn">
+                        <i class="fas fa-copy"></i> Copy to Clipboard
+                    </button>
+                    <a href="#" class="action-button whatsapp" id="whatsapp-btn" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Share on WhatsApp
+                    </a>
+                </div>
+                
+                <div class="section-title">
+                    <i class="fas fa-file-alt"></i> Content Preview
+                </div>
+                
+                <div class="content-preview" id="content-preview">
+                    <!-- Generated content will be displayed here -->
+                </div>
+                
+                <div class="section-title">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Preview
+                </div>
+                
+                <div class="whatsapp-preview" id="whatsapp-preview">
+                    <!-- WhatsApp preview will be displayed here -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="loading-container" class="glass-card" style="display: none;">
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Processing your content...</div>
+            </div>
+        </div>
+        
+        <div class="examples-container">
+            <div class="examples-title">Try an example:</div>
+            <a href="#" class="example-link" data-url="https://techcrunch.com/2025/06/01/early-ai-investor-elad-gil-finds-his-next-big-bet-ai-powered-rollups/">
+                <i class="fas fa-robot"></i> AI-powered rollups
+            </a>
+            <a href="#" class="example-link" data-url="https://venturebeat.com/ai/how-emotional-intelligence-is-becoming-the-next-frontier-for-ai-development/">
+                <i class="fas fa-heart"></i> AI emotional intelligence
+            </a>
+            <a href="#" class="example-link" data-url="https://www.nature.com/articles/d41586-023-00129-7">
+                <i class="fas fa-atom"></i> Quantum AI breakthrough
+            </a>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Simple Basic Auth login modal
+            let isLoggedIn = false;
+            const BASIC_AUTH_USER = 'farizanjum';
+            const BASIC_AUTH_PASS = "1Don'tknow@@@@@@";
+
+            const loginModalHtml = `
+            <div id="login-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;">
+                <div style="background:#1f2937;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:24px;min-width:320px;color:white;">
+                    <h5 style="margin-bottom:12px;">Login required</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input id="login-username" type="text" class="form-control" placeholder="Enter username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input id="login-password" type="password" class="form-control" placeholder="Enter password">
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button id="login-cancel" class="action-button">Cancel</button>
+                        <button id="login-submit" class="btn btn-primary">Login</button>
+                    </div>
+                </div>
+            </div>`;
+            $('body').append(loginModalHtml);
+
+            function showLoginModal(onSuccess) {
+                $('#login-modal').fadeIn(120);
+                $('#login-submit').off('click').on('click', function() {
+                    const u = $('#login-username').val().trim();
+                    const p = $('#login-password').val();
+                    if (u === BASIC_AUTH_USER && p === BASIC_AUTH_PASS) {
+                        isLoggedIn = true;
+                        $('#login-modal').fadeOut(120);
+                        if (typeof onSuccess === 'function') onSuccess();
+                    } else {
+                        alert('Invalid credentials');
+                    }
+                });
+                $('#login-cancel').off('click').on('click', function(){
+                    $('#login-modal').fadeOut(120);
+                });
+            }
+
+            function getAuthHeaderIfNeeded(model) {
+                if (model === 'chatgpt') {
+                    // Use current in-memory credentials if logged in
+                    if (!isLoggedIn) return null;
+                    const token = btoa(`${BASIC_AUTH_USER}:${BASIC_AUTH_PASS}`);
+                    return { 'Authorization': `Basic ${token}` };
+                }
+                return {};
+            }
+            // Tab switching
+            $('#url-tab').click(function() {
+                $('.tab-button').removeClass('active');
+                $(this).addClass('active');
+                $('#url-content').show();
+                $('#text-content, #format-content').hide();
+            });
+            
+            $('#text-tab').click(function() {
+                $('.tab-button').removeClass('active');
+                $(this).addClass('active');
+                $('#text-content').show();
+                $('#url-content, #format-content').hide();
+            });
+            
+            $('#format-tab').click(function() {
+                $('.tab-button').removeClass('active');
+                $(this).addClass('active');
+                $('#format-content').show();
+                $('#url-content, #text-content').hide();
+            });
+            
+            // Model selection for URL tab
+            $('#chatgpt-model').click(function() {
+                const activate = () => { $('#chatgpt-model').addClass('active'); $('#mistral-model').removeClass('active'); };
+                if (!isLoggedIn) { showLoginModal(activate); } else { activate(); }
+            });
+            
+            $('#mistral-model').click(function() {
+                $('#mistral-model').addClass('active');
+                $('#chatgpt-model').removeClass('active');
+            });
+            
+            // Model selection for Text tab
+            $('#chatgpt-model-text').click(function() {
+                const activate = () => { $('#chatgpt-model-text').addClass('active'); $('#mistral-model-text').removeClass('active'); };
+                if (!isLoggedIn) { showLoginModal(activate); } else { activate(); }
+            });
+            
+            $('#mistral-model-text').click(function() {
+                $('#mistral-model-text').addClass('active');
+                $('#chatgpt-model-text').removeClass('active');
+            });
+            
+            // Example links
+            $('.example-link').click(function(e) {
+                e.preventDefault();
+                const url = $(this).data('url');
+                $('#url-input').val(url);
+                
+                // Switch to URL tab if not already active
+                if (!$('#url-tab').hasClass('active')) {
+                    $('#url-tab').click();
+                }
+            });
+            
+            // Generate content from URL
+            $('#generate-btn').click(function() {
+                const url = $('#url-input').val().trim();
+                
+                if (!url) {
+                    alert('Please enter a valid URL');
+                    return;
+                }
+                
+                // Determine which model is selected
+                const model = $('#chatgpt-model').hasClass('active') ? 'chatgpt' : 'mistral';
+                
+                // Check if web search is enabled
+                const useWebSearch = $('#web-search-checkbox').is(':checked');
+                
+                // Show loading
+                $('#loading-container').show();
+                $('#result-container').hide();
+                
+                // Make API request
+                const headers = getAuthHeaderIfNeeded(model) || {};
+                $.ajax({
+                    url: '/api/process',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: headers,
+                    data: JSON.stringify({
+                        url: url,
+                        model: model,
+                        use_web_search: useWebSearch
+                    }),
+                    success: function(response) {
+                        // Hide loading
+                        $('#loading-container').hide();
+                        
+                        // Display results
+                        displayResults(response);
+                    },
+                    error: function(xhr) {
+                        // Hide loading
+                        $('#loading-container').hide();
+                        
+                        // Show error
+                        let errorMessage = 'An error occurred while processing your request.';
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error;
+                        }
+                        alert(errorMessage);
+                    }
+                });
+            });
+            
+            // Generate content from text
+            $('#generate-text-btn').click(function() {
+                const text = $('#text-input').val().trim();
+                const title = $('#title-input').val().trim();
+                
+                if (!text) {
+                    alert('Please enter some text content');
+                    return;
+                }
+                
+                // Determine which model is selected
+                const model = $('#chatgpt-model-text').hasClass('active') ? 'chatgpt' : 'mistral';
+                
+                // Check if web search is enabled
+                const useWebSearch = $('#web-search-checkbox-text').is(':checked');
+                
+                // Show loading
+                $('#loading-container').show();
+                $('#result-container').hide();
+                
+                // Make API request
+                const headers = getAuthHeaderIfNeeded(model) || {};
+                $.ajax({
+                    url: '/api/process',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: headers,
+                    data: JSON.stringify({
+                        text: text,
+                        title: title,
+                        model: model,
+                        use_web_search: useWebSearch
+                    }),
+                    success: function(response) {
+                        // Hide loading
+                        $('#loading-container').hide();
+                        
+                        // Display results
+                        displayResults(response);
+                    },
+                    error: function(xhr) {
+                        // Hide loading
+                        $('#loading-container').hide();
+                        
+                        // Show error
+                        let errorMessage = 'An error occurred while processing your request.';
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error;
+                        }
+                        alert(errorMessage);
+                    }
+                });
+            });
+            
+            // Format text only
+            $('#format-text-btn').click(function() {
+                const text = $('#format-text-input').val().trim();
+                const title = $('#format-title-input').val().trim();
+                
+                if (!text) {
+                    alert('Please enter some text content');
+                    return;
+                }
+                
+                // Show loading
+                $('#loading-container').show();
+                $('#result-container').hide();
+                
+                // Make API request
+                $.ajax({
+                    url: '/api/process',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        text: text,
+                        title: title,
+                        format_only: true
+                    }),
+                    success: function(response) {
+                        // Hide loading
+                        $('#loading-container').hide();
+                        
+                        // Display formatted text only
+                        $('#content-preview').html(formatContentForDisplay(response.formatted_content));
+                        $('#whatsapp-preview').html(formatContentForDisplay(response.formatted_content));
+                        
+                        // No cover images for format-only mode
+                        $('#cover-image-options').empty();
+                        $('#selected-cover-image').empty();
+                        
+                        // Update WhatsApp share link
+                        updateWhatsAppLink(response.formatted_content);
+                        
+                        // Show results
+                        $('#result-container').show();
+                    },
+                    error: function(xhr) {
+                        // Hide loading
+                        $('#loading-container').hide();
+                        
+                        // Show error
+                        let errorMessage = 'An error occurred while processing your request.';
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error;
+                        }
+                        alert(errorMessage);
+                    }
+                });
+            });
+            
+            // Copy to clipboard
+            $('#copy-btn').click(function() {
+                const content = $('#content-preview').text();
+                
+                // Create a temporary textarea element to copy from
+                const textarea = document.createElement('textarea');
+                textarea.value = content;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                // Show feedback
+                const originalText = $(this).html();
+                $(this).html('<i class="fas fa-check"></i> Copied!');
+                
+                // Reset button text after 2 seconds
+                setTimeout(() => {
+                    $(this).html(originalText);
+                }, 2000);
+            });
+            
+            // Function to display results
+            function displayResults(response) {
+                // Display formatted content
+                $('#content-preview').html(formatContentForDisplay(response.formatted_content));
+                $('#whatsapp-preview').html(formatContentForDisplay(response.formatted_content));
+                
+                // Display cover image options
+                displayCoverImageOptions(response.image_urls);
+                
+                // Update WhatsApp share link
+                updateWhatsAppLink(response.formatted_content);
+                
+                // Show results
+                $('#result-container').show();
+                
+                // Scroll to results
+                $('html, body').animate({
+                    scrollTop: $('#result-container').offset().top - 20
+                }, 500);
+            }
+            
+            // Function to format content for display
+            function formatContentForDisplay(content) {
+                // Replace asterisks with HTML bold tags
+                let formattedContent = content.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+                
+                // Replace newlines with HTML line breaks
+                formattedContent = formattedContent.replace(/\n/g, '<br>');
+                
+                return formattedContent;
+            }
+            
+            // Function to display cover image options
+            function displayCoverImageOptions(imageUrls) {
+                const container = $('#cover-image-options');
+                container.empty();
+                
+                if (!imageUrls || imageUrls.length === 0) {
+                    container.html('<p>No images available</p>');
+                    return;
+                }
+                
+                // Add each image as an option
+                imageUrls.forEach((imageUrl, index) => {
+                    // Ensure URL is properly formatted
+                    let fullUrl = imageUrl;
+                    if (imageUrl.startsWith('/')) {
+                        fullUrl = imageUrl; // Relative URL, keep as is
+                    }
+                    
+                    const imageElement = $(`
+                        <div class="cover-image-option ${index === 0 ? 'selected' : ''}" data-url="${fullUrl}">
+                            <img src="${fullUrl}" alt="Cover image option ${index + 1}">
+                        </div>
+                    `);
+                    
+                    container.append(imageElement);
+                });
+                
+                // Display the first image as selected
+                if (imageUrls.length > 0) {
+                    $('#selected-cover-image').html(`
+                        <img src="${imageUrls[0]}" alt="Selected cover image">
+                    `);
+                }
+                
+                // Add click event to select an image
+                $('.cover-image-option').click(function() {
+                    $('.cover-image-option').removeClass('selected');
+                    $(this).addClass('selected');
+                    
+                    const imageUrl = $(this).data('url');
+                    $('#selected-cover-image').html(`
+                        <img src="${imageUrl}" alt="Selected cover image">
+                    `);
+                });
+            }
+            
+            // Function to update WhatsApp share link
+            function updateWhatsAppLink(content) {
+                const encodedContent = encodeURIComponent(content);
+                const whatsappUrl = `https://wa.me/?text=${encodedContent}`;
+                $('#whatsapp-btn').attr('href', whatsappUrl);
+            }
+        });
+    </script>
+</body>
+</html>

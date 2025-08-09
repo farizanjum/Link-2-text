@@ -1,0 +1,1 @@
+This directory contains tech company logos for use as cover images in the Link2Text application.

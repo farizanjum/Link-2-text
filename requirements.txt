@@ -1,0 +1,8 @@
+flask
+flask-cors
+requests
+beautifulsoup4
+newspaper3k
+nltk
+python-dotenv
+openai
