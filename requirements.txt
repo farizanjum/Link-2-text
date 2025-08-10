@@ -7,3 +7,5 @@ nltk
 python-dotenv
 openai
 gunicorn
+lxml
+lxml_html_clean
