@@ -26,10 +26,8 @@ load_dotenv() # Loads variables from .env
 
 openai_key = os.getenv("OPENAI_API_KEY")
 mistral_key = os.getenv("MISTRAL_API_KEY")
-
-# Basic Auth credentials for ChatGPT usage
-BASIC_AUTH_USERNAME = "farizanjum"
-BASIC_AUTH_PASSWORD = "1Don'tknow@@@@@@"
+BASIC_AUTH_USERNAME = os.getenv("BASIC_AUTH_USERNAME")
+BASIC_AUTH_PASSWORD = os.getenv("BASIC_AUTH_PASSWORD")
 
 # Headers for web scraping
 headers = {
