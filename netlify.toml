@@ -3,7 +3,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://YOUR-BACKEND-DOMAIN/api/:splat"
+  to = "https://link-2-text.onrender.com/api/:splat"
   status = 200
   force = true
 
