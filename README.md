@@ -74,7 +74,7 @@ API
     { "text": "...", "title": "Optional", "format_only": true }
     ```
 - Headers (ChatGPT only):
-  - Authorization: Basic base64(farizanjum:1Don'tknow@@@@@@)
+  - Authorization: Basic base64
 - Response:
   ```json
   {
