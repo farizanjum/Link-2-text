@@ -49,12 +49,6 @@ python main.py
 - Visit: http://127.0.0.1:5000
 - Select model and generate content
 
-ChatGPT login (Basic Auth)
---------------------------
-- Username: farizanjum
-- Password: 1Don'tknow@@@@@@
-- Notes: Only ChatGPT routes require login; Mistral is open by default.
-
 Environment variables
 ---------------------
 - OPENAI_API_KEY (required for ChatGPT)
