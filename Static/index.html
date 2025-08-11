@@ -608,10 +608,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Simple Basic Auth login modal
+            // Simple session-based login modal (server-side auth)
             let isLoggedIn = false;
-            const BASIC_AUTH_USER = 'farizanjum';
-            const BASIC_AUTH_PASS = "1Don'tknow@@@@@@";
 
             const loginModalHtml = `
             <div id="login-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;">
@@ -638,27 +636,33 @@
                 $('#login-submit').off('click').on('click', function() {
                     const u = $('#login-username').val().trim();
                     const p = $('#login-password').val();
-                    if (u === BASIC_AUTH_USER && p === BASIC_AUTH_PASS) {
-                        isLoggedIn = true;
-                        $('#login-modal').fadeOut(120);
-                        if (typeof onSuccess === 'function') onSuccess();
-                    } else {
-                        alert('Invalid credentials');
-                    }
+                    // Call backend to create a session
+                    $.ajax({
+                        url: '/api/auth/login',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ username: u, password: p }),
+                        success: function() {
+                            isLoggedIn = true;
+                            $('#login-modal').fadeOut(120);
+                            if (typeof onSuccess === 'function') onSuccess();
+                        },
+                        error: function() {
+                            alert('Invalid credentials');
+                        }
+                    });
                 });
                 $('#login-cancel').off('click').on('click', function(){
                     $('#login-modal').fadeOut(120);
                 });
             }
 
-            function getAuthHeaderIfNeeded(model) {
-                if (model === 'chatgpt') {
-                    // Use current in-memory credentials if logged in
-                    if (!isLoggedIn) return null;
-                    const token = btoa(`${BASIC_AUTH_USER}:${BASIC_AUTH_PASS}`);
-                    return { 'Authorization': `Basic ${token}` };
+            function requireLoginIfNeeded(model, onReady) {
+                if (model === 'chatgpt' && !isLoggedIn) {
+                    showLoginModal(onReady);
+                } else {
+                    onReady();
                 }
-                return {};
             }
             // Tab switching
             $('#url-tab').click(function() {
@@ -685,7 +689,7 @@
             // Model selection for URL tab
             $('#chatgpt-model').click(function() {
                 const activate = () => { $('#chatgpt-model').addClass('active'); $('#mistral-model').removeClass('active'); };
-                if (!isLoggedIn) { showLoginModal(activate); } else { activate(); }
+                requireLoginIfNeeded('chatgpt', activate);
             });
             
             $('#mistral-model').click(function() {
@@ -696,7 +700,7 @@
             // Model selection for Text tab
             $('#chatgpt-model-text').click(function() {
                 const activate = () => { $('#chatgpt-model-text').addClass('active'); $('#mistral-model-text').removeClass('active'); };
-                if (!isLoggedIn) { showLoginModal(activate); } else { activate(); }
+                requireLoginIfNeeded('chatgpt', activate);
             });
             
             $('#mistral-model-text').click(function() {
@@ -736,12 +740,10 @@
                 $('#result-container').hide();
                 
                 // Make API request
-                const headers = getAuthHeaderIfNeeded(model) || {};
-                $.ajax({
+                const run = () => $.ajax({
                     url: '/api/process',
                     type: 'POST',
                     contentType: 'application/json',
-                    headers: headers,
                     data: JSON.stringify({
                         url: url,
                         model: model,
@@ -766,6 +768,7 @@
                         alert(errorMessage);
                     }
                 });
+                requireLoginIfNeeded(model, run);
             });
             
             // Generate content from text
@@ -789,12 +792,10 @@
                 $('#result-container').hide();
                 
                 // Make API request
-                const headers = getAuthHeaderIfNeeded(model) || {};
-                $.ajax({
+                const run = () => $.ajax({
                     url: '/api/process',
                     type: 'POST',
                     contentType: 'application/json',
-                    headers: headers,
                     data: JSON.stringify({
                         text: text,
                         title: title,
@@ -820,6 +821,7 @@
                         alert(errorMessage);
                     }
                 });
+                requireLoginIfNeeded(model, run);
             });
             
             // Format text only

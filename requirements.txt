@@ -3,6 +3,7 @@ flask-cors
 requests
 beautifulsoup4
 newspaper3k
+lxml_html_clean
 nltk
 python-dotenv
 openai

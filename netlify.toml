@@ -6,6 +6,7 @@
   to = "https://link-2-text.onrender.com/api/:splat"
   status = 200
   force = true
+  headers = {Authorization = "*"}
 
 # SPA fallback
 [[redirects]]
